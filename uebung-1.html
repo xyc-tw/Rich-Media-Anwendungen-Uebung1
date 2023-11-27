@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>HTML-Template: Basis-File</title>
+        <script type="text/javascript">
+            window.addEventListener( 'load', canvasApp, false );
+            function canvasApp() {
+                if (!document.createElement( 'canvas' ).getContext) {
+                    return;
+                }
+                var canvas = document.getElementById("canvas");
+                var context = canvas.getContext('2d');
+                var img = new Image();
+                img.src = "colored.jpg";
+                var rasterSize = 1;
+
+                img.addEventListener( 'load', onImageLoaded);
+                document.getElementById("rangeInput").addEventListener("change", onSizeChange);
+                var rangeValue = document.getElementById("rangeValue")
+
+                function onImageLoaded() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    context.drawImage(img, 0, 0); 
+                    rangeValue.textContent = rasterSize;
+                    var imgData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    for (var x = 0; x < imgData.width; x++) {
+                        for (var y = 0; y < imgData.height; y++) {
+
+                            var rasterX = ((x / rasterSize) | 0) * rasterSize;
+                            var rasterY = ((y / rasterSize) | 0) * rasterSize;
+
+                            var rasterValIndex = (rasterX + rasterY * imgData.width) * 4;
+
+                            r = imgData.data[rasterValIndex];
+                            g = imgData.data[rasterValIndex + 1];
+                            b = imgData.data[rasterValIndex + 2];
+                            a = imgData.data[rasterValIndex + 3];
+
+                            currentIndex = (x + y * imgData.width) * 4;
+                            imgData.data[currentIndex] = r;
+                            imgData.data[currentIndex + 1] = g;
+                            imgData.data[currentIndex + 2] = b;
+                            imgData.data[currentIndex + 3] = a;
+                        }
+                    }
+                    context.putImageData(imgData, 0, 0)
+                }   
+
+                function onSizeChange(e){
+                    rasterSize = e.target.value;
+                    onImageLoaded();
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div style="position: absolute; top: 50px; left: 50px; display: flex; flex-direction: column;">
+            <canvas id="canvas">
+                Your browser does not support the HTML 5 Canvas.
+            </canvas>
+            <div style="align-self: center; height: 40px; display: flex; align-items:center;">
+                <span style="width:80px;">Raster Size: </span>
+                <input type="range" id="rangeInput" min="1" max="5" step="1" value="1" list="markers" style="width: 200px"/>
+                <datalist id="markers">
+                    <option value="1"></option>
+                    <option value="2"></option>
+                    <option value="3"></option>
+                    <option value="4"></option>
+                    <option value="5"></option>
+                  </datalist>
+                <span id="rangeValue" style="width: 10px; text-align: end;"></span>
+            </div>
+            
+        </div>
+    </body>
+</html>
+
+
+<!-- 1900 240 -->
+
